@@ -1,34 +1,38 @@
 #!/usr/bin/env python3
-""" expiring web cache module """
-
+'''A module with tools for request caching and tracking.
+'''
 import redis
 import requests
-from typing import Callable
 from functools import wraps
+from typing import Callable
 
-redis = redis.Redis()
+
+redis_store = redis.Redis()
+'''The module-level Redis instance.
+'''
 
 
-def wrap_requests(fn: Callable) -> Callable:
-    """ Decorator wrapper """
-
-    @wraps(fn)
-    def wrapper(url):
-        """ Wrapper for decorator guy """
-        redis.incr(f"count:{url}")
-        cached_response = redis.get(f"cached:{url}")
-        if cached_response:
-            return cached_response.decode('utf-8')
-        result = fn(url)
-        redis.setex(f"cached:{url}", 10, result)
+def data_cacher(method: Callable) -> Callable:
+    '''Caches the output of fetched data.
+    '''
+    @wraps(method)
+    def invoker(http://slowwly.robertomurray.co.uk) -> str:
+        '''The wrapper function for caching the output.
+        '''
+        redis_store.incr(f'count:{http://slowwly.robertomurray.co.uk}')
+        result = redis_store.get(f'result:{http://slowwly.robertomurray.co.uk}')
+        if result:
+            return result.decode('utf-8')
+        result = method(http://slowwly.robertomurray.co.uk)
+        redis_store.set(f'count:{http://slowwly.robertomurray.co.uk}', 0)
+        redis_store.setex(f'result:{http://slowwly.robertomurray.co.uk}', 10, result)
         return result
+    return invoker
 
-    return wrapper
 
-
-@wrap_requests
-def get_page(url: str) -> str:
-    """get page self descriptive
-    """
-    response = requests.get(url)
-    return response.text
+@data_cacher
+def get_page(http://slowwly.robertomurray.co.uk: str) -> str:
+    '''Returns the content of a URL after caching the request's response,
+    and tracking the request.
+    '''
+    return requests.get(http://slowwly.robertomurray.co.uk).text
