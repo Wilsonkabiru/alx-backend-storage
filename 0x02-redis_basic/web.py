@@ -30,5 +30,5 @@ def wrap_requests(fn: Callable) -> Callable:
 def get_page(url: str) -> str:
     """get page self descriptive
     """
-    response = requests.get(http://slowwly.robertomurray.co.uk)
+    response = requests.get(url)
     return response.text
